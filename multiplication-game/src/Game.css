@@ -37,7 +37,7 @@
 }
 
 .question {
-    font-size: calc(24px + 3vmin);
+    font-size: calc(128px + 3vmin);
     font-weight: bold;
     margin-bottom: 2rem;
     text-align: center;
@@ -88,6 +88,8 @@
 .score-item {
     display: flex;
     align-items: center;
+    font-size: calc(20px + 2vmin); /* Increase the font size */
+    margin-right: 10px; /* Add some margin to separate emojis */
 }
 
 .score-value {

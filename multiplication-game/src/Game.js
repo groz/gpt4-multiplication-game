@@ -1,146 +1,173 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./Game.css";
+
+const levelConfig = {
+    EASY: { min: 1, max: 5, emoji: "🐣" },
+    MEDIUM: { min: 2, max: 6, emoji: "🐥" },
+    HARD: { min: 3, max: 9, emoji: "💪" },
+};
+
+const QuestionStatus = {
+    ONGOING: "ONGOING",
+    CORRECT: "CORRECT",
+    INCORRECT: "INCORRECT",
+};
+
+const getWrongAnswerRange = (level) => {
+    const min = level.min * level.min;
+    const max = level.max * level.max;
+    return { min, max };
+};
+
+const generateRandomNumber = (min, max) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
+
+const generateQuestionByLevel = (level) => {
+    const num1 = generateRandomNumber(level.min, level.max);
+    const num2 = generateRandomNumber(level.min, level.max);
+    return { num1, num2 };
+};
+
+const generateWrongAnswers = (level, correctAnswer) => {
+    const { min, max } = getWrongAnswerRange(level);
+    let wrongAnswers = [];
+
+    do {
+        wrongAnswers = Array.from({ length: 2 }, () =>
+            generateRandomNumber(min, max)
+        );
+    } while (
+        wrongAnswers[0] === correctAnswer ||
+        wrongAnswers[1] === correctAnswer ||
+        wrongAnswers[0] === wrongAnswers[1]
+    );
+
+    return wrongAnswers;
+};
+
+const questionGenerator = {
+    createQuestion(level) {
+        const { num1, num2 } = generateQuestionByLevel(level);
+        const correctAnswer = num1 * num2;
+        const wrongAnswers = generateWrongAnswers(level, correctAnswer);
+        const allAnswers = [correctAnswer, ...wrongAnswers];
+        allAnswers.sort(() => Math.random() - 0.5);
+    
+        return {
+            question: `${num1} x ${num2}`,
+            correctAnswer,
+            allAnswers,
+        };
+    },
+};
+
+const AnswerButton = ({ answer, onClick, currentQuestion }) => {
+    const [buttonState, setButtonState] = useState("default");
+
+    useEffect(() => {
+        setButtonState("default");
+    }, [currentQuestion]);
+
+    const handleClick = () => {
+        const isCorrect = onClick(answer);
+        setButtonState(isCorrect ? "correct" : "incorrect");
+    };
+
+    const buttonClass =
+        buttonState === "correct"
+            ? "correct-answer"
+            : buttonState === "incorrect"
+                ? "incorrect-answer"
+                : "";
+
+    return (
+        <button className={buttonClass} onClick={handleClick}>
+            {answer}
+        </button>
+    );
+};
+
+
+
 
 const Game = () => {
     const [score, setScore] = useState({ correct: 0, incorrect: 0 });
     const [attempts, setAttempts] = useState(0);
     const [currentQuestion, setCurrentQuestion] = useState({});
     const [correctAnswerSelected, setCorrectAnswerSelected] = useState(false);
-    const [level, setLevel] = useState({ level: "EASY", emoji: "🟢" });
+    const [level, setLevel] = useState(levelConfig.EASY);
     const MAX_INCORRECT_ANSWERS = 2;
 
-    const generateRandomNumber = (min, max) =>
-        Math.floor(Math.random() * (max - min + 1)) + min;
-
-    const generateQuestionByLevel = () => {
-        const min = 1;
-        const max =
-            level.level === "EASY" ? 5 : level.level === "MEDIUM" ? 7 : 9;
-        const num1 = generateRandomNumber(min, max);
-        const num2 = generateRandomNumber(min, max);
-        return { num1, num2 };
+    const initialQuestionStatus = {
+        status: QuestionStatus.ONGOING,
     };
 
-    const generateNewQuestion = () => {
+    const [questionStatus, setQuestionStatus] = useState(initialQuestionStatus);
+
+    const generateNewQuestion = useCallback(() => {
         setCorrectAnswerSelected(false);
-        const { num1, num2 } = generateQuestionByLevel();
-        const correctAnswer = num1 * num2;
-
-        const min =
-            level.level === "EASY" ? 1 : level.level === "MEDIUM" ? 11 : 40;
-        const max =
-            level.level === "EASY" ? 10 : level.level === "MEDIUM" ? 39 : 81;
-
-        const wrongAnswers = Array.from({ length: 2 }, () =>
-            generateRandomNumber(min, max)
-        );
-
-        // Ensure that the wrong answers do not equal the correct answer
-        while (
-            wrongAnswers[0] === correctAnswer ||
-            wrongAnswers[1] === correctAnswer
-        ) {
-            wrongAnswers[0] = generateRandomNumber(min, max);
-            wrongAnswers[1] = generateRandomNumber(min, max);
-        }
-
-        const allAnswers = [correctAnswer, ...wrongAnswers];
-        allAnswers.sort(() => Math.random() - 0.5);
-
-        setCurrentQuestion({
-            question: `${num1} x ${num2}`,
-            correctAnswer,
-            allAnswers,
-        });
-
-        const buttons = document.querySelectorAll(".options button");
-        buttons.forEach((button) => {
-            button.disabled = false;
-            button.classList.remove("correct-answer", "incorrect-answer");
-        });
+        setCurrentQuestion(questionGenerator.createQuestion(level));
 
         setAttempts(0);
-    };
+    }, [level]);
 
-    const handleLevelChange = (selectedLevel, emoji) => {
-        setLevel({ level: selectedLevel, emoji });
-        generateNewQuestion();
+    const handleLevelChange = (selectedLevel) => {
+        setLevel(levelConfig[selectedLevel]);
     };
 
     useEffect(() => {
         generateNewQuestion();
-    }, []);
+    }, [generateNewQuestion]);
 
-    const markButton = (button) => {
-        if (!correctAnswerSelected) {
-            button.classList.add("incorrect-answer");
+    const checkAnswer = (selectedAnswer) => {
+        const isCorrectAnswer = selectedAnswer === currentQuestion.correctAnswer;
+
+        if (isCorrectAnswer) {
+            setScore((prevScore) => ({ ...prevScore, correct: prevScore.correct + 1 }));
+            setQuestionStatus({ status: QuestionStatus.CORRECT });
+        } else {
+            setAttempts((prevAttempts) => prevAttempts + 1);
+            setQuestionStatus({ status: QuestionStatus.INCORRECT });
+
+            if (attempts + 1 === MAX_INCORRECT_ANSWERS) {
+                setScore((prevScore) => ({ ...prevScore, incorrect: prevScore.incorrect + 1 }));
+            }
         }
-        button.disabled = true;
-    };
 
-    const disableAllButtons = () => {
-        const buttons = document.querySelectorAll(".options button");
-        buttons.forEach((button) => {
-            button.disabled = true;
-        });
-    };
-
-    const checkAnswer = (selectedAnswer, button) => {
-        if (selectedAnswer === currentQuestion.correctAnswer) {
-            setScore({ ...score, correct: score.correct + 1 });
-            button.classList.add("correct-answer");
-            setCorrectAnswerSelected(true);
-            disableAllButtons();
+        if (isCorrectAnswer || attempts + 1 === MAX_INCORRECT_ANSWERS) {
             setTimeout(() => {
                 generateNewQuestion();
+                setQuestionStatus(initialQuestionStatus);
             }, 500);
-        } else {
-            setAttempts((prevAttempts) => {
-                const updatedAttempts = prevAttempts + 1;
-                if (updatedAttempts < MAX_INCORRECT_ANSWERS) {
-                    markButton(button);
-                } else {
-                    markButton(button);
-                    setScore({ ...score, incorrect: score.incorrect + 1 });
-                    disableAllButtons();
-                    setTimeout(() => {
-                        generateNewQuestion();
-                    }, 500);
-                }
-                return updatedAttempts;
-            });
         }
-    };
 
+        return isCorrectAnswer;
+    };
 
     return (
         <div className={`game`}>
             <div className="game-container">
                 <div className="levels">
-                    {[
-                        { level: "EASY", emoji: "🟢" },
-                        { level: "MEDIUM", emoji: "🟡" },
-                        { level: "HARD", emoji: "🔴" },
-                    ].map((lvl) => (
+                    {Object.keys(levelConfig).map((lvl) => (
                         <button
-                            key={lvl.level}
-                            className={`level-button${level.level === lvl.level ? " active-level" : ""
+                            key={lvl}
+                            className={`level-button${level === levelConfig[lvl] ? " active-level" : ""
                                 }`}
-                            onClick={() => handleLevelChange(lvl.level, lvl.emoji)}
+                            onClick={() => handleLevelChange(lvl)}
                         >
-                            {lvl.emoji}
+                            {levelConfig[lvl].emoji}
                         </button>
                     ))}
                 </div>
                 <div className="question">{currentQuestion.question}</div>
                 <div className="options">
                     {currentQuestion.allAnswers?.map((answer, index) => (
-                        <button
+                        <AnswerButton
                             key={index}
-                            onClick={(e) => checkAnswer(answer, e.target)}
-                        >
-                            {answer}
-                        </button>
+                            answer={answer}
+                            onClick={checkAnswer}
+                            currentQuestion={currentQuestion}
+                        />
                     ))}
                 </div>
                 <div className="scoreboard">
@@ -150,7 +177,7 @@ const Game = () => {
                         </span>
                         <span className="score-value">{score.correct}</span>
                     </div>
-                    <div className="score-item">
+                    <div className="      score-item">
                         <span role="img" aria-label="thumbs-down">
                             👎
                         </span>
@@ -159,6 +186,7 @@ const Game = () => {
                 </div>
             </div>
         </div>
+
     );
 };
 
