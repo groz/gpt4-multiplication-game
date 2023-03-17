@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplication Game</title>
+    <link rel="stylesheet" href="Game.css">
+</head>
+<body>
+    <div class="game">
+        <div class="game-container">
+            <div class="levels"></div>
+            <div class="question"></div>
+            <div class="options"></div>
+            <div class="scoreboard">
+                <div class="score-item">
+                    <span role="img" aria-label="thumbs-up">👍</span>
+                    <span class="score-value" id="correct-score">0</span>
+                </div>
+                <div class="score-item">
+                    <span role="img" aria-label="thumbs-down">👎</span>
+                    <span class="score-value" id="incorrect-score">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

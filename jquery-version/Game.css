@@ -1,0 +1,108 @@
+.game {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.game-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100%;
+    padding: 1rem;
+}
+
+.levels {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.level-button {
+    font-size: calc(16px + 2vmin);
+    padding: 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    border: none;
+    text-align: center;
+    background-color: #ffffff;
+    transition: background-color 0.3s;
+}
+
+.active-level {
+    font-weight: bold;
+}
+
+.question {
+    font-size: calc(128px + 3vmin);
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.level-button.active-level {
+    font-weight: bold;
+    border: 2px solid #4caf50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    background-color: #e8f5e9;
+}
+
+.options {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.options button {
+    font-size: calc(16px + 2vmin);
+    width: 30%;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border: 2px solid #333333;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #e3f2fd;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+
+.options button:hover {
+    border-color: #4caf50;
+}
+
+.scoreboard {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.score-item {
+    display: flex;
+    align-items: center;
+    font-size: calc(20px + 2vmin); /* Increase the font size */
+    margin-right: 10px; /* Add some margin to separate emojis */
+}
+
+.score-value {
+    font-size: calc(16px + 2vmin);
+    margin-left: 5px;
+}
+
+.correct-answer {
+    background-color: #4caf50 !important;
+    border-color: #4caf50 !important;
+}
+
+.incorrect-answer {
+    background-color: #f44336 !important;
+    border-color: #f44336 !important;
+}
