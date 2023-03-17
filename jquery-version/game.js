@@ -77,18 +77,24 @@ function updateScore() {
     $("#incorrect-score").text(score.incorrect);
 }
 
+function disableAllButtons() {
+    $('.options button').prop('disabled', true);
+}
+
 function checkAnswer(selectedAnswer) {
     const isCorrect = selectedAnswer === correctAnswer;
 
     if (isCorrect) {
         score.correct++;
         updateScore();
+        disableAllButtons();
     } else {
         attempts++;
 
         if (attempts === MAX_INCORRECT_ANSWERS) {
             score.incorrect++;
             updateScore();
+            disableAllButtons();
         }
     }
 
