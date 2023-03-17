@@ -5,12 +5,18 @@ const levelConfig = {
 };
 
 const MAX_INCORRECT_ANSWERS = 2;
-let currentLevel = levelConfig.EASY;
-let question = "";
-let correctAnswer = null;
-let allAnswers = [];
-let score = { correct: 0, incorrect: 0 };
-let attempts = 0;
+
+const gameState = {
+    levels: [levelConfig.EASY, levelConfig.MEDIUM, levelConfig.HARD],
+    currentLevel: levelConfig.EASY,
+    question: "",
+    correctAnswer: null,
+    allAnswers: [],
+    score: { correct: 0, incorrect: 0 },
+    attempts: 0,
+    clickedAnswerIndices: [],
+    transitioning: false,
+};
 
 function generateRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -41,96 +47,186 @@ function generateWrongAnswers(level, correctAnswer) {
 }
 
 function generateNewQuestion() {
-    attempts = 0;
+    sendMessage(newQuestionMessage());
+}
 
-    const { num1, num2 } = generateQuestionByLevel(currentLevel);
-    correctAnswer = num1 * num2;
-    const wrongAnswers = generateWrongAnswers(currentLevel, correctAnswer);
+function render(state) {
+    $('.question').text(state.question);
 
-    question = `${num1} x ${num2}`;
-    allAnswers = [correctAnswer, ...wrongAnswers];
-    allAnswers.sort(() => Math.random() - 0.5);
-
-    $('.question').text(question);
-    $('.options').empty();
-
-    allAnswers.forEach((answer, index) => {
-        const $button = $('<button>')
-            .text(answer)
-            .click(() => {
-                if ($button.prop('disabled')) {
-                    return;
-                }
-                $button.prop('disabled', true);
-                $button.removeClass('correct-answer incorrect-answer');
-                const isAnswerCorrect = checkAnswer(answer);
-                $button.addClass(isAnswerCorrect ? 'correct-answer' : 'incorrect-answer');
-            });
-
-        $('.options').append($button);
+    state.levels.forEach((level, index) => {
+        const $button = $('.levels button').eq(index);
+        renderLevelButton($button, state, level);
     });
 
+    state.allAnswers.forEach((answer, index) => {
+        const $button = $('.options button').eq(index);
+        renderAnswerButton($button, state, index);
+    });
+
+    $("#correct-score").text(state.score.correct);
+    $("#incorrect-score").text(state.score.incorrect);
 }
 
-function updateScore() {
-    $("#correct-score").text(score.correct);
-    $("#incorrect-score").text(score.incorrect);
+$(document).ready(function () {
+    generateNewQuestion();
+});
+
+function levelChangedMessage(level) {
+    return {
+        type: 'LEVEL_CHANGED',
+        payload: { level },
+    };
 }
 
-function disableAllButtons() {
-    $('.options button').prop('disabled', true);
+function answerSelectedMessage(selectedAnswerIndex) {
+    return {
+        type: 'ANSWER_SELECTED',
+        payload: { selectedAnswerIndex },
+    };
 }
 
-function checkAnswer(selectedAnswer) {
-    const isCorrect = selectedAnswer === correctAnswer;
+function newQuestionMessage() {
+    return {
+        type: 'NEW_QUESTION',
+    };
+}
+
+function newQuestionTransitionMessage() {
+    return {
+        type: 'NEW_QUESTION_TRANSITION',
+    };
+}
+
+function createSendMessage(initialState, reducer, render) {
+    let currentState = initialState;
+
+    return function sendMessage(message) {
+        currentState = reducer(currentState, message);
+        setTimeout(() => render(currentState), 0);
+    };
+}
+
+const sendMessage = createSendMessage(gameState, reducer, render);
+
+function handleLevelChanged(state, payload) {
+    const { level } = payload;
+    const nextState = {
+        ...state,
+        currentLevel: level,
+    };
+    return handleNewQuestion(nextState);
+}
+
+function handleAnswerSelected(state, payload) {
+    if (state.transitioning) {
+        return state;
+    }
+
+    const { selectedAnswerIndex } = payload;
+
+    let nextState = { ...state };
+    let { attempts, correctAnswer, score, clickedAnswerIndices } = nextState;
+
+    const isCorrect = state.allAnswers[selectedAnswerIndex] === correctAnswer;
 
     if (isCorrect) {
         score.correct++;
-        updateScore();
-        disableAllButtons();
     } else {
         attempts++;
-
         if (attempts === MAX_INCORRECT_ANSWERS) {
             score.incorrect++;
-            updateScore();
-            disableAllButtons();
         }
     }
 
     if (isCorrect || attempts === MAX_INCORRECT_ANSWERS) {
-        setTimeout(() => {
-            generateNewQuestion();
-        }, 500);
+        nextState = handleNewQuestionTransition(nextState);
+    } else {
+        nextState.attempts = attempts;
     }
 
-    return isCorrect;
+    nextState.clickedAnswerIndices = [...clickedAnswerIndices, selectedAnswerIndex];
+
+    return nextState;
 }
 
-function renderLevelButtons() {
-    Object.keys(levelConfig).forEach((levelKey) => {
-        const level = levelConfig[levelKey];
-        const $button = $('<button>')
-            .addClass('level-button')
-            .text(level.emoji)
-            .click(() => {
-                currentLevel = level;
-                $('.level-button').removeClass('active-level');
-                $button.addClass('active-level');
-                generateNewQuestion();
-            });
+function handleNewQuestion(state) {
+    const { num1, num2 } = generateQuestionByLevel(state.currentLevel);
+    const correctAnswer = num1 * num2;
+    const wrongAnswers = generateWrongAnswers(state.currentLevel, correctAnswer);
 
-        if (currentLevel === level) {
-            $button.addClass('active-level');
-        }
+    const question = `${num1} x ${num2}`;
+    const allAnswers = [correctAnswer, ...wrongAnswers];
+    allAnswers.sort(() => Math.random() - 0.5);
 
-        $('.levels').append($button);
+    return {
+        ...state,
+        question,
+        correctAnswer,
+        allAnswers,
+        attempts: 0,
+        clickedAnswerIndices: [],
+        transitioning: false,
+    };
+}
+
+function handleNewQuestionTransition(state) {
+    const nextState = {
+        ...state,
+        transitioning: true,
+    };
+
+    setTimeout(() => {
+        sendMessage(newQuestionMessage());
+    }, 500);
+
+    return nextState;
+}
+
+const messageHandlers = {
+    LEVEL_CHANGED: handleLevelChanged,
+    ANSWER_SELECTED: handleAnswerSelected,
+    NEW_QUESTION: handleNewQuestion,
+    NEW_QUESTION_TRANSITION: handleNewQuestionTransition,
+};
+
+function reducer(state, message) {
+    const handler = messageHandlers[message.type];
+
+    if (handler) {
+        return handler(state, message.payload);
+    }
+
+    return state;
+}
+
+function renderLevelButton($button, state, level) {
+    $button.text(level.emoji);
+    $button.off('click').click(() => {
+        sendMessage(levelChangedMessage(level));
     });
 
+    if (state.currentLevel === level) {
+        $button.addClass('active-level');
+    } else {
+        $button.removeClass('active-level');
+    }
 }
 
-$(document).ready(function () {
-    // Initialize the game
-    renderLevelButtons();
-    generateNewQuestion();
-});
+function renderAnswerButton($button, state, index) {
+    const answer = state.allAnswers[index];
+    $button.text(answer);
+
+    if (state.clickedAnswerIndices.includes(index)) {
+        $button.prop('disabled', true);
+        $button.removeClass('correct-answer incorrect-answer');
+        const isAnswerCorrect = answer == state.correctAnswer;
+        $button.addClass(isAnswerCorrect ? 'correct-answer' : 'incorrect-answer');
+    } else {
+        $button.prop('disabled', false);
+        $button.removeClass('correct-answer incorrect-answer');
+    }
+
+    $button.off('click').click(() => {
+        sendMessage(answerSelectedMessage(index));
+    });
+}
