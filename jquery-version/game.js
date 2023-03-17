@@ -11,7 +11,6 @@ let correctAnswer = null;
 let allAnswers = [];
 let score = { correct: 0, incorrect: 0 };
 let attempts = 0;
-let lastClickedAnswer = null;
 
 function generateRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -59,9 +58,13 @@ function generateNewQuestion() {
         const $button = $('<button>')
             .text(answer)
             .click(() => {
-                lastClickedAnswer = answer;
-                const isCorrect = checkAnswer(answer);
-                $button.addClass(isCorrect ? 'correct-answer' : 'incorrect-answer');
+                if ($button.prop('disabled')) {
+                    return;
+                }
+                $button.prop('disabled', true);
+                $button.removeClass('correct-answer incorrect-answer');
+                const isAnswerCorrect = checkAnswer(answer);
+                $button.addClass(isAnswerCorrect ? 'correct-answer' : 'incorrect-answer');
             });
 
         $('.options').append($button);
