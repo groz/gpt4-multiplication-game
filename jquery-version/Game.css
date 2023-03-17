@@ -106,3 +106,8 @@
     background-color: #f44336 !important;
     border-color: #f44336 !important;
 }
+
+.correct-answer:disabled,
+.incorrect-answer:disabled {
+    color: inherit;
+}
