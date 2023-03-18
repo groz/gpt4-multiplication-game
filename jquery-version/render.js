@@ -55,9 +55,10 @@ function renderTimerProgress(state) {
 
     if (state.currentLevel.timerDuration) {
         $timerContainer.show();
+        $timerProgress.show();
         $timerProgress.width("0%");
     } else {
-        $timerContainer.hide();
+        $timerProgress.hide();
     }
 
     const timerPercentage = state.timer
