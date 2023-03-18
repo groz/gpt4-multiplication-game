@@ -1,10 +1,11 @@
 const levelConfig = {
-    EASY: { min: 1, max: 5, emoji: "🐣" },
-    MEDIUM: { min: 2, max: 6, emoji: "🐥" },
-    HARD: { min: 3, max: 9, emoji: "💪" },
+    EASY: { min: 1, max: 5, emoji: "🐣", timerDuration: null },
+    MEDIUM: { min: 2, max: 6, emoji: "🐥", timerDuration: 20000 },
+    HARD: { min: 3, max: 9, emoji: "💪", timerDuration: 10000 },
 };
 
 const MAX_INCORRECT_ANSWERS = 2;
+const TIMER_TICK_PERIOD = 50;
 
 const initialState = {
     levels: [levelConfig.EASY, levelConfig.MEDIUM, levelConfig.HARD],
@@ -16,13 +17,15 @@ const initialState = {
     attempts: 0,
     clickedAnswerIndices: [],
     transitioning: false,
+    timer: null,
+    timerID: null,
 };
 
 function reducer(state, message) {
     const handler = messageHandlers[message.type];
 
     if (handler) {
-        return handler(state, message.payload);
+        state = handler(state, message.payload);
     }
 
     return state;

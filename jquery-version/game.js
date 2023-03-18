@@ -2,12 +2,12 @@ $(document).ready(function () {
     generateNewQuestion();
 });
 
-function createSendMessage(initialState, reducer, render) {
-    let currentState = initialState;
-
-    return function sendMessage(message) {
-        currentState = reducer(currentState, message);
-        setTimeout(() => render(currentState), 0);
+function createSendMessage(state, reducer, render) {
+    return (message) => {
+        setTimeout(() => {
+            state = reducer(state, message);
+            render(state), 0;
+        })
     };
 }
 

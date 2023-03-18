@@ -27,3 +27,9 @@ function newQuestionTransitionMessage() {
 function generateNewQuestion() {    
     sendMessage(newQuestionMessage());
 }
+
+function timerTickMessage() {
+    return {
+        type: "TIMER_TICK",
+    };
+}

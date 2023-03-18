@@ -13,6 +13,8 @@ function render(state) {
 
     $("#correct-score").text(state.score.correct);
     $("#incorrect-score").text(state.score.incorrect);
+
+    renderTimerProgress(state);
 }
 
 function renderLevelButton($button, state, level) {
@@ -45,4 +47,21 @@ function renderAnswerButton($button, state, index) {
     $button.off('click').click(() => {
         sendMessage(answerSelectedMessage(index));
     });
+}
+
+function renderTimerProgress(state) {
+    const $timerContainer = $(".timer-container");
+    const $timerProgress = $(".timer-progress");
+
+    if (state.currentLevel.timerDuration) {
+        $timerContainer.show();
+        $timerProgress.width("0%");
+    } else {
+        $timerContainer.hide();
+    }
+
+    const timerPercentage = state.timer
+        ? (state.timer / state.currentLevel.timerDuration) * 100
+        : 0;
+    $timerProgress.width(`${timerPercentage}%`);
 }
