@@ -11,9 +11,7 @@ function render(state) {
         renderAnswerButton($button, state, index);
     });
 
-    $("#correct-score").text(state.score.correct);
-    $("#incorrect-score").text(state.score.incorrect);
-
+    renderScoreboard(state);
     renderTimerProgress(state);
 }
 
@@ -65,4 +63,19 @@ function renderTimerProgress(state) {
         ? (state.timer / state.currentLevel.timerDuration) * 100
         : 0;
     $timerProgress.width(`${timerPercentage}%`);
+}
+
+function calculateTotalScores(levelScores, scoreType) {
+    return Object.values(levelScores).reduce(
+        (sum, levelScore) => sum + levelScore[scoreType],
+        0
+    );
+}
+
+function renderScoreboard(state) {
+    const totalCorrect = calculateTotalScores(state.levelScores, 'correct');
+    const totalIncorrect = calculateTotalScores(state.levelScores, 'incorrect');
+
+    $("#correct-score").text(totalCorrect);
+    $("#incorrect-score").text(totalIncorrect);
 }

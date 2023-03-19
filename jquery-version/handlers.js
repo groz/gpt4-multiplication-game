@@ -22,16 +22,16 @@ function handleAnswerSelected(state, payload) {
     const { selectedAnswerIndex } = payload;
 
     let nextState = { ...state };
-    let { attempts, correctAnswer, score, clickedAnswerIndices } = nextState;
+    let { attempts, correctAnswer, levelScores } = nextState;
 
     const isCorrect = state.allAnswers[selectedAnswerIndex] === correctAnswer;
 
     if (isCorrect) {
-        score.correct++;
+        levelScores[state.currentLevel.key].correct++;
     } else {
         attempts++;
         if (attempts === MAX_INCORRECT_ANSWERS) {
-            score.incorrect++;
+            levelScores[state.currentLevel.key].incorrect++;
         }
     }
 
@@ -41,7 +41,7 @@ function handleAnswerSelected(state, payload) {
         nextState.attempts = attempts;
     }
 
-    nextState.clickedAnswerIndices = [...clickedAnswerIndices, selectedAnswerIndex];
+    nextState.clickedAnswerIndices = [...nextState.clickedAnswerIndices, selectedAnswerIndex];
 
     return nextState;
 }
