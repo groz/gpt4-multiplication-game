@@ -65,24 +65,18 @@ function renderTimerProgress(state) {
     $timerProgress.width(`${timerPercentage}%`);
 }
 
-function calculateTotalScores(levelScores, scoreType, levelWeights) {
-    return Object.entries(levelScores).reduce((sum, [level, levelScore]) => {
-        const scoreValue = levelScore[scoreType];
-        const weightedValue = scoreType === "correct" ? scoreValue * levelWeights[level] : scoreValue;
-        return sum + weightedValue;
-    }, 0);
-}
-
 function renderScoreboard(state) {
-    const levelWeights = {
-        EASY: 1,
-        MEDIUM: 2,
-        HARD: 3,
-    };
-    
-    const totalCorrect = calculateTotalScores(state.levelScores, "correct", levelWeights);
-    const totalIncorrect = calculateTotalScores(state.levelScores, "incorrect", levelWeights);
-    
-    $("#correct-score").text(totalCorrect);
-    $("#incorrect-score").text(totalIncorrect);
+    const correctScore = Object.keys(state.levelScores).reduce((sum, difficulty) => {
+        const levelScore = state.levelScores[difficulty];
+        const levelWeight = levelConfig[difficulty].weight;
+        return sum + (levelScore.correct * levelWeight);
+    }, 0);
+
+    const incorrectScore = Object.keys(state.levelScores).reduce((sum, difficulty) => {
+        const levelScore = state.levelScores[difficulty];
+        return sum + levelScore.incorrect;
+    }, 0);
+
+    $("#correct-score").text(correctScore);
+    $("#incorrect-score").text(incorrectScore);
 }

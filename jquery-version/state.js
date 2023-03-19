@@ -1,7 +1,7 @@
 const levelConfig = {
-    EASY: { key: "EASY", min: 1, max: 5, emoji: "🐣", timerDuration: null },
-    MEDIUM: { key: "MEDIUM", min: 2, max: 6, emoji: "🐥", timerDuration: 20000 },
-    HARD: { key: "HARD", min: 3, max: 9, emoji: "💪", timerDuration: 10000 },
+    EASY: { difficulty: "EASY", min: 1, max: 5, emoji: "🐣", timerDuration: null, weight: 1 },
+    MEDIUM: { difficulty: "MEDIUM", min: 2, max: 6, emoji: "🐥", timerDuration: 20000, weight: 2 },
+    HARD: { difficulty: "HARD", min: 3, max: 9, emoji: "💪", timerDuration: 10000, weight: 3 },
 };
 
 const MAX_INCORRECT_ANSWERS = 2;

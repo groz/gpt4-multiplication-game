@@ -27,11 +27,11 @@ function handleAnswerSelected(state, payload) {
     const isCorrect = state.allAnswers[selectedAnswerIndex] === correctAnswer;
 
     if (isCorrect) {
-        levelScores[state.currentLevel.key].correct++;
+        levelScores[state.currentLevel.difficulty].correct++;
     } else {
         attempts++;
         if (attempts === MAX_INCORRECT_ANSWERS) {
-            levelScores[state.currentLevel.key].incorrect++;
+            levelScores[state.currentLevel.difficulty].incorrect++;
         }
     }
 
