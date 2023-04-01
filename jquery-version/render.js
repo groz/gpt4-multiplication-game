@@ -21,7 +21,7 @@ function renderLevelButton($button, state, level) {
         sendMessage(levelChangedMessage(level));
     });
 
-    if (state.currentLevel === level) {
+    if (state.currentLevel.difficulty === level.difficulty) {
         $button.addClass('active-level');
     } else {
         $button.removeClass('active-level');

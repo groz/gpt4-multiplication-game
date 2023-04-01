@@ -6,9 +6,14 @@ function createSendMessage(state, reducer, render) {
     return (message) => {
         setTimeout(() => {
             state = reducer(state, message);
+            saveState(state);
             render(state), 0;
         })
     };
 }
 
-const sendMessage = createSendMessage(initialState, reducer, render);
+const sendMessage = createSendMessage(
+    loadState(),
+    reducer,
+    render
+);
