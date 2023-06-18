@@ -120,7 +120,7 @@ function handleTimerTick(state) {
 
     // Remove one of the wrong answers after half the time has elapsed
     if (
-        remainingTime === state.currentLevel.timerDuration / 2 &&
+        remainingTime <= (state.currentLevel.timerDuration / 2) &&
         nextState.attempts === 0
     ) {
         const wrongAnswerIndex = state.allAnswers.findIndex(

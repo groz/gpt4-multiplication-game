@@ -52,7 +52,6 @@ function saveState(state) {
 }
 
 function loadState() {
-    return initialState;
     const serializedState = localStorage.getItem('gameState');
 
     if (serializedState && serializedState !== "undefined") {
@@ -65,8 +64,6 @@ function loadState() {
 function createSendMessage(state, reducer, render) {
     function messageSender(message) {
         function messageHandler() {
-            console.log(message);
-
             state = reducer(state, message);
             saveState(state);
             render(state);

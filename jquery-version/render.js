@@ -65,6 +65,7 @@ function renderTimerProgress(state) {
     const timerPercentage = state.timer
         ? (state.timer / state.currentLevel.timerDuration) * 100
         : 0;
+
     if (!state.transitioning) {
         $timerProgress.width(`${timerPercentage}%`);
     }
