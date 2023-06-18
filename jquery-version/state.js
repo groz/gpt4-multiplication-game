@@ -1,13 +1,13 @@
 const levelConfig = {
     EASY: { difficulty: "EASY", min: 1, max: 5, emoji: "🐣", timerDuration: null, weight: 1 },
     MEDIUM: { difficulty: "MEDIUM", min: 2, max: 6, emoji: "🐥", timerDuration: 16000, weight: 2 },
-    HARD: { difficulty: "HARD", min: 3, max: 9, emoji: "💪", timerDuration: 12000, weight: 3 },
-    EXPERT: { difficulty: "EXPERT", min: 4, max: 9, emoji: "🚀", timerDuration: 8000, weight: 4 },
+    HARD: { difficulty: "HARD", min: 3, max: 9, emoji: "💡", timerDuration: 12000, weight: 3 },
+    EXPERT: { difficulty: "EXPERT", min: 4, max: 9, emoji: "⚡", timerDuration: 7000, weight: 4 },
     MASTER: { difficulty: "MASTER", min: 2, max: 9, emoji: "🏆", timerDuration: 4000, weight: 5 },
 };
 
 const MAX_INCORRECT_ANSWERS = 2;
-const TIMER_TICK_PERIOD = 20;
+const TIMER_TICK_PERIOD = 30;
 
 const initialState = {
     levels: [
@@ -52,6 +52,7 @@ function saveState(state) {
 }
 
 function loadState() {
+    return initialState;
     const serializedState = localStorage.getItem('gameState');
 
     if (serializedState && serializedState !== "undefined") {
