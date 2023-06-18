@@ -29,17 +29,21 @@ function renderLevelButton($button, state, level) {
 }
 
 function renderAnswerButton($button, state, index) {
+    $button.removeClass('correct-answer incorrect-answer correct-unselected-answer');
     const answer = state.allAnswers[index];
+    const isAnswerCorrect = answer == state.correctAnswer;
+
     $button.text(answer);
 
     if (state.clickedAnswerIndices.includes(index)) {
         $button.prop('disabled', true);
-        $button.removeClass('correct-answer incorrect-answer');
-        const isAnswerCorrect = answer == state.correctAnswer;
         $button.addClass(isAnswerCorrect ? 'correct-answer' : 'incorrect-answer');
     } else {
         $button.prop('disabled', false);
-        $button.removeClass('correct-answer incorrect-answer');
+    }
+
+    if (state.highlightCorrect && isAnswerCorrect) {
+        $button.addClass('correct-unselected-answer');
     }
 
     $button.off('click').click(() => {

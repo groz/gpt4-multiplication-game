@@ -33,6 +33,7 @@ const initialState = {
     transitioning: false,
     timer: null,
     timerID: null,
+    highlightCorrect: false,
 };
 
 function reducer(state, message) {
@@ -52,9 +53,11 @@ function saveState(state) {
 
 function loadState() {
     const serializedState = localStorage.getItem('gameState');
-    if (serializedState) {
+
+    if (serializedState && serializedState !== "undefined") {
         return JSON.parse(serializedState);
     }
+
     return initialState;
 }
 

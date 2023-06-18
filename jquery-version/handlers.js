@@ -10,8 +10,9 @@ function handleLevelChanged(state, payload) {
     const nextState = {
         ...state,
         currentLevel: level,
+        highlightCorrect: true,
     };
-    return handleNewQuestion(nextState);
+    return handleNewQuestionTransition(nextState);
 }
 
 function handleAnswerSelected(state, payload) {
@@ -35,13 +36,20 @@ function handleAnswerSelected(state, payload) {
         }
     }
 
+    if (attempts === MAX_INCORRECT_ANSWERS) {
+        nextState.highlightCorrect = true;
+    }
+
     if (isCorrect || attempts === MAX_INCORRECT_ANSWERS) {
         nextState = handleNewQuestionTransition(nextState);
     } else {
         nextState.attempts = attempts;
     }
 
-    nextState.clickedAnswerIndices = [...nextState.clickedAnswerIndices, selectedAnswerIndex];
+    nextState.clickedAnswerIndices = [
+        ...nextState.clickedAnswerIndices,
+        selectedAnswerIndex,
+    ];
 
     return nextState;
 }
@@ -70,14 +78,15 @@ function handleNewQuestion(state) {
 
     return {
         ...state,
-        question,
-        correctAnswer,
-        allAnswers,
+        question: question,
+        correctAnswer: correctAnswer,
+        allAnswers: allAnswers,
         attempts: 0,
         clickedAnswerIndices: [],
         transitioning: false,
         timer: state.currentLevel.timerDuration,
         timerID: timerID,
+        highlightCorrect: false,
     };
 }
 
@@ -105,6 +114,7 @@ function handleTimerTick(state) {
     nextState.timer = remainingTime;
 
     if (remainingTime === 0) {
+        nextState.highlightCorrect = true;
         return handleNewQuestionTransition(nextState);
     }
 
@@ -117,9 +127,7 @@ function handleTimerTick(state) {
             (answer) => answer !== state.correctAnswer
         );
 
-        sendMessage(
-            answerSelectedMessage(wrongAnswerIndex)
-        );
+        sendMessage(answerSelectedMessage(wrongAnswerIndex));
     }
 
     return nextState;
