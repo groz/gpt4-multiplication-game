@@ -87,9 +87,10 @@ function handleNewQuestionTransition(state) {
         transitioning: true,
     };
 
-    setTimeout(() => {
-        sendMessage(newQuestionMessage());
-    }, 500);
+    setTimeout(
+        () => sendMessage(newQuestionMessage()),
+        500
+    );
 
     return nextState;
 }
@@ -107,6 +108,7 @@ function handleTimerTick(state) {
         return handleNewQuestionTransition(nextState);
     }
 
+    // Remove one of the wrong answers after half the time has elapsed
     if (
         remainingTime === state.currentLevel.timerDuration / 2 &&
         nextState.attempts === 0
@@ -114,7 +116,10 @@ function handleTimerTick(state) {
         const wrongAnswerIndex = state.allAnswers.findIndex(
             (answer) => answer !== state.correctAnswer
         );
-        sendMessage(answerSelectedMessage(wrongAnswerIndex), 0);
+
+        sendMessage(
+            answerSelectedMessage(wrongAnswerIndex)
+        );
     }
 
     return nextState;

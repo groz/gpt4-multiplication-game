@@ -57,3 +57,25 @@ function loadState() {
     }
     return initialState;
 }
+
+function createSendMessage(state, reducer, render) {
+    function messageSender(message) {
+        function messageHandler() {
+            console.log(message);
+
+            state = reducer(state, message);
+            saveState(state);
+            render(state);
+        }
+
+        setTimeout(messageHandler, 0);
+    }
+
+    return messageSender;
+}
+
+const sendMessage = createSendMessage(
+    loadState(),
+    reducer,
+    render
+);
