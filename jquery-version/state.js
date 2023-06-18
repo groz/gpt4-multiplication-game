@@ -22,7 +22,7 @@ const initialState = {
     correctAnswer: null,
     allAnswers: [],
     levelScores: {
-        EASY: { correct: 3309, incorrect: 111 },
+        EASY: { correct: 0, incorrect: 0 },
         MEDIUM: { correct: 0, incorrect: 0 },
         HARD: { correct: 0, incorrect: 0 },
         EXPERT: { correct: 0, incorrect: 0 },

@@ -3,13 +3,17 @@ $(document).ready(function () {
 });
 
 function createSendMessage(state, reducer, render) {
-    return (message) => {
-        setTimeout(() => {
+    function messageSender(message) {
+        function messageHandler() {
             state = reducer(state, message);
             saveState(state);
-            render(state), 0;
-        })
-    };
+            render(state);
+        }
+
+        setTimeout(messageHandler, 0);
+    }
+
+    return messageSender;
 }
 
 const sendMessage = createSendMessage(
