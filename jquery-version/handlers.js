@@ -23,12 +23,13 @@ function handleAnswerSelected(state, payload) {
     const { selectedAnswerIndex } = payload;
 
     let nextState = { ...state };
-    let { attempts, correctAnswer, levelScores } = nextState;
+    let { attempts, correctAnswer, levelScores, questionWeights } = nextState;
 
     const isCorrect = state.allAnswers[selectedAnswerIndex] === correctAnswer;
 
     if (isCorrect) {
         levelScores[state.currentLevel.difficulty].correct++;
+        questionWeights[state.correctAnswerIndex] *= state.reductionMultiplier;
     } else {
         attempts++;
         if (attempts === MAX_INCORRECT_ANSWERS) {
@@ -54,18 +55,49 @@ function handleAnswerSelected(state, payload) {
     return nextState;
 }
 
+function generateAnswers(table, count, correctAnswer, correctAnswerIndex) {
+    const answers = [correctAnswer];
+    count = Math.min(count, table.size - 2); // -2 to account for correct answer
+
+    let i = 1;
+    while (answers.length < count && i < 5 * count) {
+        // 5 * count is an infinite loop guard
+        let shift = (i % 2 === 0) ? i / 2 : -(Math.floor(i / 2) + 1);
+        let idx = correctAnswerIndex + shift;
+
+        if (0 <= idx && idx < table.size) {
+            let [a, b] = table.multipliers(idx);
+            let ans = a * b;
+
+            if (!answers.includes(ans)) {
+                answers.push(ans);
+            }
+        }
+
+        i++;
+    }
+
+    shuffle(answers);
+    return answers;
+}
+
 function handleNewQuestion(state) {
     if (state.timerID) {
         clearInterval(state.timerID);
     }
+    console.log(state.questionWeights);
 
-    const { num1, num2 } = generateQuestionByLevel(state.currentLevel);
+    const [num1, num2] = getRandomQuestion(
+        ALL_QUESTIONS,
+        state.questionWeights,
+        state.currentLevel.min,
+        state.currentLevel.max,
+    );
+
     const correctAnswer = num1 * num2;
-    const wrongAnswers = generateWrongAnswers(state.currentLevel, correctAnswer);
-
+    const correctAnswerIndex = ALL_QUESTIONS.index(num1, num2);
+    const allAnswers = generateAnswers(ALL_QUESTIONS, 3, correctAnswer, correctAnswerIndex);
     const question = `${num1} x ${num2}`;
-    const allAnswers = [correctAnswer, ...wrongAnswers];
-    allAnswers.sort(() => Math.random() - 0.5);
 
     let timerID = null;
 
@@ -80,6 +112,7 @@ function handleNewQuestion(state) {
         ...state,
         question: question,
         correctAnswer: correctAnswer,
+        correctAnswerIndex: correctAnswerIndex,
         allAnswers: allAnswers,
         attempts: 0,
         clickedAnswerIndices: [],

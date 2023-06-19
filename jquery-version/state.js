@@ -1,18 +1,31 @@
+let ALL_QUESTIONS = generateTable(1, 2, 1, 3);
+
 const levelConfig = {
-    EASY: { difficulty: "EASY", min: 1, max: 5, emoji: "🐣", timerDuration: null, weight: 1 },
-    MEDIUM: { difficulty: "MEDIUM", min: 2, max: 6, emoji: "🐥", timerDuration: 16000, weight: 2 },
-    HARD: { difficulty: "HARD", min: 3, max: 9, emoji: "💡", timerDuration: 12000, weight: 3 },
-    EXPERT: { difficulty: "EXPERT", min: 4, max: 9, emoji: "⚡", timerDuration: 7000, weight: 4 },
-    MASTER: { difficulty: "MASTER", min: 2, max: 9, emoji: "🏆", timerDuration: 4000, weight: 5 },
+    EASY: generateLevel("EASY", 1, 5, "🐣", null, 1),
+    MEDIUM: generateLevel("MEDIUM", 2, 6, "🐥", 16000, 2),
+    HARD: generateLevel("HARD", 3, 9, "💪", 12000, 3),
+    EXPERT: generateLevel("EXPERT", 4, 9, "⚡", 7000, 4),
+    MASTER: generateLevel("MASTER", 2, 9, "🏆", 4000, 5),
 };
+
+function generateLevel(difficulty, min, max, emoji, timerDuration, weight) {
+    return {
+        difficulty,
+        min: ALL_QUESTIONS.index(min, min),
+        max: ALL_QUESTIONS.index(max, max),
+        emoji,
+        timerDuration,
+        weight,
+    }
+}
 
 const MAX_INCORRECT_ANSWERS = 2;
 const TIMER_TICK_PERIOD = 30;
 
 const initialState = {
     levels: [
-        levelConfig.EASY, 
-        levelConfig.MEDIUM, 
+        levelConfig.EASY,
+        levelConfig.MEDIUM,
         levelConfig.HARD,
         levelConfig.EXPERT,
         levelConfig.MASTER
@@ -20,6 +33,7 @@ const initialState = {
     currentLevel: levelConfig.EASY,
     question: "",
     correctAnswer: null,
+    correctAnswerIndex: null,
     allAnswers: [],
     levelScores: {
         EASY: { correct: 0, incorrect: 0 },
@@ -34,6 +48,10 @@ const initialState = {
     timer: null,
     timerID: null,
     highlightCorrect: false,
+
+    // weights, one for each question. reduced for each correct answer.
+    questionWeights: Array(ALL_QUESTIONS.size).fill(1),
+    reductionMultiplier: 0.8,
 };
 
 function reducer(state, message) {
