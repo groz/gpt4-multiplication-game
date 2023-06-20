@@ -126,8 +126,11 @@
     background-color: #f3f3f3;
     border-radius: 5px;
     max-height: 20px;
-    /* Add this line */
     margin-bottom: 20px;
+}
+
+.timer-container-hidden {
+    background-color: transparent;
 }
 
 .timer-progress {

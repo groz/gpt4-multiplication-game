@@ -54,12 +54,17 @@ function renderAnswerButton($button, state, index) {
 function renderTimerProgress(state) {
     const $timerContainer = $(".timer-container");
     const $timerProgress = $(".timer-progress");
+    const $timerMarker = $(".timer-marker");
 
     if (state.currentLevel.timerDuration) {
         $timerContainer.show();
         $timerProgress.show();
+        $timerMarker.show();
+        $timerContainer.removeClass("timer-container-hidden");
     } else {
         $timerProgress.hide();
+        $timerMarker.hide();
+        $timerContainer.addClass("timer-container-hidden");
     }
 
     const timerPercentage = state.questionState.remainingTime

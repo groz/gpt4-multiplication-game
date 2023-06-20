@@ -1,4 +1,4 @@
-let ALL_QUESTIONS = generateTable(1, 2, 1, 3);
+let ALL_QUESTIONS = generateTable(1, 9, 1, 9);
 
 const levelConfig = {
     EASY: generateLevel("EASY", 1, 5, "🐣", null, 1),
