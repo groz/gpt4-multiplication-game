@@ -10,26 +10,30 @@ function handleLevelChanged(state, payload) {
     const nextState = {
         ...state,
         currentLevel: level,
-        highlightCorrect: true,
+        questionState: {
+            ...state.questionState,
+            highlightCorrect: true,
+        },
     };
     return handleNewQuestionTransition(nextState);
 }
 
 function handleAnswerSelected(state, payload) {
-    if (state.transitioning) {
+    if (state.questionState.transitioning) {
         return state;
     }
 
     const { selectedAnswerIndex } = payload;
 
     let nextState = { ...state };
-    let { attempts, correctAnswer, levelScores, questionWeights } = nextState;
+    let { questionWeights, levelScores } = nextState;
+    let { attempts, correctAnswer } = nextState.questionState;
 
-    const isCorrect = state.allAnswers[selectedAnswerIndex] === correctAnswer;
+    const isCorrect = state.questionState.allAnswers[selectedAnswerIndex] === correctAnswer;
 
     if (isCorrect) {
         levelScores[state.currentLevel.difficulty].correct++;
-        questionWeights[state.correctAnswerIndex] *= state.reductionMultiplier;
+        questionWeights[state.questionState.correctAnswerIndex] *= state.reductionMultiplier;
     } else {
         attempts++;
         if (attempts === MAX_INCORRECT_ANSWERS) {
@@ -38,17 +42,17 @@ function handleAnswerSelected(state, payload) {
     }
 
     if (attempts === MAX_INCORRECT_ANSWERS) {
-        nextState.highlightCorrect = true;
+        nextState.questionState.highlightCorrect = true;
     }
 
     if (isCorrect || attempts === MAX_INCORRECT_ANSWERS) {
         nextState = handleNewQuestionTransition(nextState);
     } else {
-        nextState.attempts = attempts;
+        nextState.questionState.attempts = attempts;
     }
 
-    nextState.clickedAnswerIndices = [
-        ...nextState.clickedAnswerIndices,
+    nextState.questionState.clickedAnswerIndices = [
+        ...nextState.questionState.clickedAnswerIndices,
         selectedAnswerIndex,
     ];
 
@@ -82,8 +86,8 @@ function generateAnswers(table, count, correctAnswer, correctAnswerIndex) {
 }
 
 function handleNewQuestion(state) {
-    if (state.timerID) {
-        clearInterval(state.timerID);
+    if (state.questionState.timerID) {
+        clearInterval(state.questionState.timerID);
     }
 
     const [num1, num2] = getRandomQuestion(
@@ -109,24 +113,30 @@ function handleNewQuestion(state) {
 
     return {
         ...state,
-        question: question,
-        questionTimerStart: Date.now(),
-        correctAnswer: correctAnswer,
-        correctAnswerIndex: correctAnswerIndex,
-        allAnswers: allAnswers,
-        attempts: 0,
-        clickedAnswerIndices: [],
-        transitioning: false,
-        remainingTime: state.currentLevel.timerDuration,
-        timerID: timerID,
-        highlightCorrect: false,
+        questionState: {
+            ...state.questionState,
+            questionText: question,
+            questionTimerStart: Date.now(),
+            correctAnswer: correctAnswer,
+            correctAnswerIndex: correctAnswerIndex,
+            allAnswers: allAnswers,
+            attempts: 0,
+            clickedAnswerIndices: [],
+            transitioning: false,
+            remainingTime: state.currentLevel.timerDuration,
+            timerID: timerID,
+            highlightCorrect: false,
+        },
     };
 }
 
 function handleNewQuestionTransition(state) {
     const nextState = {
         ...state,
-        transitioning: true,
+        questionState: {
+            ...state.questionState,
+            transitioning: true,
+        },
     };
 
     setTimeout(
@@ -138,28 +148,28 @@ function handleNewQuestionTransition(state) {
 }
 
 function handleTimerTick(state) {
-    if (!state.currentLevel.timerDuration || state.transitioning) {
+    if (!state.currentLevel.timerDuration || state.questionState.transitioning) {
         return state;
     }
 
     const nextState = { ...state };
     const now = Date.now();
-    const elapsed = now - state.questionTimerStart;
+    const elapsed = now - state.questionState.questionTimerStart;
     const remainingTime = Math.max(0, state.currentLevel.timerDuration - elapsed);
-    nextState.remainingTime = remainingTime;
+    nextState.questionState.remainingTime = remainingTime;
 
     if (remainingTime <= 0) {
-        nextState.highlightCorrect = true;
+        nextState.questionState.highlightCorrect = true;
         return handleNewQuestionTransition(nextState);
     }
 
     // Remove one of the wrong answers after half the time has elapsed
     if (
         remainingTime <= (state.currentLevel.timerDuration / 2) &&
-        nextState.attempts === 0
+        nextState.questionState.attempts === 0
     ) {
-        const wrongAnswerIndex = state.allAnswers.findIndex(
-            (answer) => answer !== state.correctAnswer
+        const wrongAnswerIndex = state.questionState.allAnswers.findIndex(
+            (answer) => answer !== state.questionState.correctAnswer
         );
 
         sendMessage(answerSelectedMessage(wrongAnswerIndex));

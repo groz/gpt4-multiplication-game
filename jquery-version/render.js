@@ -1,12 +1,12 @@
 function render(state) {
-    $('.question').text(state.question);
+    $('.question').text(state.questionState.questionText);
 
     state.levels.forEach((level, index) => {
         const $button = $('.levels button').eq(index);
         renderLevelButton($button, state, level);
     });
 
-    state.allAnswers.forEach((answer, index) => {
+    state.questionState.allAnswers.forEach((answer, index) => {
         const $button = $('.options button').eq(index);
         renderAnswerButton($button, state, index);
     });
@@ -30,19 +30,19 @@ function renderLevelButton($button, state, level) {
 
 function renderAnswerButton($button, state, index) {
     $button.removeClass('correct-answer incorrect-answer correct-unselected-answer');
-    const answer = state.allAnswers[index];
-    const isAnswerCorrect = answer == state.correctAnswer;
+    const answer = state.questionState.allAnswers[index];
+    const isAnswerCorrect = answer == state.questionState.correctAnswer;
 
     $button.text(answer);
 
-    if (state.clickedAnswerIndices.includes(index)) {
+    if (state.questionState.clickedAnswerIndices.includes(index)) {
         $button.prop('disabled', true);
         $button.addClass(isAnswerCorrect ? 'correct-answer' : 'incorrect-answer');
     } else {
         $button.prop('disabled', false);
     }
 
-    if (state.highlightCorrect && isAnswerCorrect) {
+    if (state.questionState.highlightCorrect && isAnswerCorrect) {
         $button.addClass('correct-unselected-answer');
     }
 
@@ -62,11 +62,11 @@ function renderTimerProgress(state) {
         $timerProgress.hide();
     }
 
-    const timerPercentage = state.remainingTime
-        ? (state.remainingTime / state.currentLevel.timerDuration) * 100
+    const timerPercentage = state.questionState.remainingTime
+        ? (state.questionState.remainingTime / state.currentLevel.timerDuration) * 100
         : 0;
 
-    if (!state.transitioning) {
+    if (!state.questionState.transitioning) {
         $timerProgress.width(`${timerPercentage}%`);
     }
 }

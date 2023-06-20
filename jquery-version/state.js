@@ -30,12 +30,20 @@ const initialState = {
         levelConfig.EXPERT,
         levelConfig.MASTER
     ],
+    questionState: {
+        questionText: "",
+        questionTimerStart: null,
+        correctAnswer: null,
+        correctAnswerIndex: null,
+        allAnswers: [],
+        attempts: 0,
+        clickedAnswerIndices: [],
+        transitioning: false,
+        remainingTime: null,
+        timerID: null,
+        highlightCorrect: false,
+    },
     currentLevel: levelConfig.EASY,
-    question: "",
-    questionTimerStart: null,
-    correctAnswer: null,
-    correctAnswerIndex: null,
-    allAnswers: [],
     levelScores: {
         EASY: { correct: 0, incorrect: 0 },
         MEDIUM: { correct: 0, incorrect: 0 },
@@ -43,12 +51,6 @@ const initialState = {
         EXPERT: { correct: 0, incorrect: 0 },
         MASTER: { correct: 0, incorrect: 0 },
     },
-    attempts: 0,
-    clickedAnswerIndices: [],
-    transitioning: false,
-    remainingTime: null,
-    timerID: null,
-    highlightCorrect: false,
 
     // weights, one for each question. reduced for each correct answer.
     questionWeights: Array(ALL_QUESTIONS.size).fill(1),
@@ -78,7 +80,7 @@ function loadState() {
         storedState = JSON.parse(serializedState);
     }
 
-    return {...initialState, ...storedState};
+    return { ...initialState, ...storedState };
 }
 
 function createSendMessage(state, reducer, render) {
