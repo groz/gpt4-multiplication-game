@@ -20,7 +20,7 @@ function generateLevel(difficulty, min, max, emoji, timerDuration, weight) {
 }
 
 const MAX_INCORRECT_ANSWERS = 2;
-const TIMER_TICK_PERIOD = 30;
+const TIMER_TICK_PERIOD = 50;
 
 const initialState = {
     levels: [
@@ -61,6 +61,7 @@ const initialState = {
     reductionMultiplier: 0.9,
 
     cleanState: false,
+    debug: true,
 };
 
 function cleanLevelScores() {
@@ -105,7 +106,17 @@ function loadState() {
 function createSendMessage(state, reducer, render) {
     function messageSender(message) {
         function messageHandler() {
+            if (state.debug) {
+                console.log("message: ", message);
+                console.log("state: ", state);
+            }
+
             state = reducer(state, message);
+
+            if (state.debug) {
+                console.log("new state: ", state);
+            }
+
             saveState(state);
             render(state);
         }

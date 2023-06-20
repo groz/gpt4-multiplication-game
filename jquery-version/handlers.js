@@ -247,6 +247,8 @@ function handleNewGame(state, {force}) {
         },
     }
 
+    nextState.questionState.transitioning = false;
+
     return isContinue
         ? handleTimerTick(nextState)
         : handleNewQuestion(nextState);
