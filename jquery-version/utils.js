@@ -19,3 +19,14 @@ function mergeOverrideEmpty(dst, src) {
         }
     });
 }
+
+function formatTime(timeInMilliseconds) {
+    let seconds = Math.floor(timeInMilliseconds / 1000);
+    let minutes = Math.floor(seconds / 60);
+    seconds = seconds % 60;
+
+    let formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+    let formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
+
+    return formattedMinutes + ":" + formattedSeconds;
+}

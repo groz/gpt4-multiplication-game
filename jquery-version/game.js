@@ -1,3 +1,3 @@
 $(document).ready(function () {
-    sendMessage(newQuestionMessage());
+    sendMessage(newGameMessage());
 });

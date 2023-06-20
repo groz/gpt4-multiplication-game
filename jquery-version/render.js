@@ -13,6 +13,7 @@ function render(state) {
 
     renderScoreboard(state);
     renderTimerProgress(state);
+    renderGameTimer(state);
 }
 
 function renderLevelButton($button, state, level) {
@@ -90,4 +91,37 @@ function renderScoreboard(state) {
 
     $("#correct-score").text(correctScore);
     $("#incorrect-score").text(incorrectScore);
+}
+
+function renderGameTimer(state) {
+    const $gameTimer = $(".game-timer");
+    const $gameStartButton = $(".game-start");
+    const $gameRestartButton = $(".game-restart");
+
+    $gameStartButton.off('click').click(() => {
+        sendMessage(newGameMessage());
+    });
+
+    $gameRestartButton.off('click').click(() => {
+        console.log("restart");
+        sendMessage(newGameMessage(true));
+    });
+
+    if (state.gameState.timerText) {
+        $gameTimer.show();
+    } else {
+        $gameTimer.hide();
+    }
+
+    $gameTimer.text(state.gameState.timerText);
+
+    if (state.gameState.isGameOver) {
+        $gameTimer.hide();
+        $gameRestartButton.hide();
+        $gameStartButton.show();        
+    } else {
+        $gameTimer.show();
+        $gameRestartButton.show();
+        $gameStartButton.hide();
+    }
 }

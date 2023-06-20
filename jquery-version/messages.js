@@ -29,3 +29,10 @@ function timerTickMessage() {
         type: "TIMER_TICK",
     };
 }
+
+function newGameMessage(force = false) {
+    return {
+        type: "NEW_GAME",
+        payload: { force },
+    };
+}

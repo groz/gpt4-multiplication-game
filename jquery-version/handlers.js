@@ -3,9 +3,14 @@ const messageHandlers = {
     ANSWER_SELECTED: handleAnswerSelected,
     NEW_QUESTION: handleNewQuestion,
     TIMER_TICK: handleTimerTick,
+    NEW_GAME: handleNewGame,
 };
 
 function handleLevelChanged(state, payload) {
+    if (state.gameState.isGameOver) {
+        return state;
+    }
+
     const { level } = payload;
     const nextState = {
         ...state,
@@ -19,6 +24,10 @@ function handleLevelChanged(state, payload) {
 }
 
 function handleAnswerSelected(state, payload) {
+    if (state.gameState.isGameOver) {
+        return state;
+    }
+
     if (state.questionState.transitioning) {
         return state;
     }
@@ -86,8 +95,8 @@ function generateAnswers(table, count, correctAnswer, correctAnswerIndex) {
 }
 
 function handleNewQuestion(state) {
-    if (state.questionState.timerID) {
-        clearInterval(state.questionState.timerID);
+    if (state.gameState.isGameOver) {
+        return state;
     }
 
     const [num1, num2] = getRandomQuestion(
@@ -102,15 +111,6 @@ function handleNewQuestion(state) {
     const allAnswers = generateAnswers(ALL_QUESTIONS, 3, correctAnswer, correctAnswerIndex);
     const question = `${num1} x ${num2}`;
 
-    let timerID = null;
-
-    if (state.currentLevel.timerDuration !== null) {
-        timerID = setInterval(
-            () => sendMessage(timerTickMessage()),
-            TIMER_TICK_PERIOD
-        );
-    }
-
     return {
         ...state,
         questionState: {
@@ -124,13 +124,16 @@ function handleNewQuestion(state) {
             clickedAnswerIndices: [],
             transitioning: false,
             remainingTime: state.currentLevel.timerDuration,
-            timerID: timerID,
             highlightCorrect: false,
         },
     };
 }
 
 function handleNewQuestionTransition(state) {
+    if (state.gameState.isGameOver) {
+        return state;
+    }
+
     const nextState = {
         ...state,
         questionState: {
@@ -147,15 +150,42 @@ function handleNewQuestionTransition(state) {
     return nextState;
 }
 
+function calculateRemainingTime(startTime, timerDuration) {
+    const now = Date.now();
+    const elapsed = now - startTime;
+    return Math.max(0, timerDuration - elapsed);
+}
+
 function handleTimerTick(state) {
-    if (!state.currentLevel.timerDuration || state.questionState.transitioning) {
+    if (state.gameState.isGameOver) {
         return state;
     }
 
     const nextState = { ...state };
-    const now = Date.now();
-    const elapsed = now - state.questionState.questionTimerStart;
-    const remainingTime = Math.max(0, state.currentLevel.timerDuration - elapsed);
+
+    // Update game
+    const gameRemainingTime = calculateRemainingTime(
+        state.gameState.timerStart,
+        state.gameState.timerDuration,
+    );
+    nextState.gameState.remainingTime = gameRemainingTime;
+    nextState.gameState.isGameOver = gameRemainingTime <= 0;
+
+    if (nextState.gameState.isGameOver) {
+        return nextState;
+    }
+
+    nextState.gameState.timerText = formatTime(gameRemainingTime);
+
+    // Update question
+    if (!state.currentLevel.timerDuration || state.questionState.transitioning) {
+        return nextState;
+    }
+
+    const remainingTime = calculateRemainingTime(
+        state.questionState.questionTimerStart,
+        state.currentLevel.timerDuration,
+    );
     nextState.questionState.remainingTime = remainingTime;
 
     if (remainingTime <= 0) {
@@ -176,4 +206,41 @@ function handleTimerTick(state) {
     }
 
     return nextState;
+}
+
+function handleNewGame(state, {force}) {
+    if (state.gameState.timerID) {
+        clearInterval(state.gameState.timerID);
+    }
+    console.log('new game', state, force);
+
+    let timerID = setInterval(
+        () => sendMessage(timerTickMessage()),
+        TIMER_TICK_PERIOD
+    );
+
+    let levelScores = cleanLevelScores();
+
+    let timerStart = Date.now();
+    let isContinue = !force && !state.gameState.isGameOver;
+    if (isContinue) {
+        console.log("continue");
+        timerStart -= state.gameState.timerDuration - state.gameState.remainingTime;
+        levelScores = state.levelScores;
+    }
+
+    let nextState = {
+        ...state,
+        levelScores: levelScores,
+        gameState: {
+            ...state.gameState,
+            timerStart: timerStart,
+            timerID: timerID,
+            isGameOver: false,
+        },
+    }
+
+    return isContinue
+        ? handleTimerTick(nextState)
+        : handleNewQuestion(nextState);
 }

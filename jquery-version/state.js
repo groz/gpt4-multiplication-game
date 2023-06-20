@@ -40,24 +40,36 @@ const initialState = {
         clickedAnswerIndices: [],
         transitioning: false,
         remainingTime: null,
-        timerID: null,
         highlightCorrect: false,
     },
     currentLevel: levelConfig.EASY,
-    levelScores: {
-        EASY: { correct: 0, incorrect: 0 },
-        MEDIUM: { correct: 0, incorrect: 0 },
-        HARD: { correct: 0, incorrect: 0 },
-        EXPERT: { correct: 0, incorrect: 0 },
-        MASTER: { correct: 0, incorrect: 0 },
+    levelScores: cleanLevelScores(),
+    gameState: {
+        timerStart: null,
+        timerDuration: 5 * 60 * 1000,
+        // timerDuration: 2 * 1000, // 2 seconds
+        remainingTime: null,
+        timerText: "",
+        
+        // has to be true in initial state to start a new game
+        // TODO: debug why this is necessary
+        isGameOver: true,
     },
 
     // weights, one for each question. reduced for each correct answer.
     questionWeights: Array(ALL_QUESTIONS.size).fill(1),
-    reductionMultiplier: 0.8,
+    reductionMultiplier: 0.9,
 
     cleanState: false,
 };
+
+function cleanLevelScores() {
+    let result = {};
+    Object.keys(levelConfig).forEach(key => {
+        result[key] = { correct: 0, incorrect: 0 };
+    });
+    return result;
+}
 
 function reducer(state, message) {
     const handler = messageHandlers[message.type];
@@ -87,7 +99,7 @@ function loadState() {
         storedState = JSON.parse(serializedState);
     }
 
-    return {...initialState, ...storedState};
+    return { ...initialState, ...storedState };
 }
 
 function createSendMessage(state, reducer, render) {
