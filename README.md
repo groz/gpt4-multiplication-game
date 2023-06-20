@@ -8,3 +8,4 @@
 ## TODO
 
 - Put timer and restart button into one container and don't overlay on each other.
+- Store only relevant part of state in local storage.

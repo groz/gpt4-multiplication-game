@@ -44,7 +44,7 @@ function handleAnswerSelected(state, payload) {
         levelScores[state.currentLevel.difficulty].correct++;
         questionWeights[state.questionState.correctAnswerIndex] *= state.reductionMultiplier;
 
-        if (questionWeights[state.questionState.correctAnswerIndex] < 0.9) {
+        if (questionWeights[state.questionState.correctAnswerIndex] < 0.5) {
             questionWeights = rescale(questionWeights);
         }
     } else {

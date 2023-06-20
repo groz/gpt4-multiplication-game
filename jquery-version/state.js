@@ -58,10 +58,10 @@ const initialState = {
 
     // weights, one for each question. reduced for each correct answer.
     questionWeights: Array(ALL_QUESTIONS.size).fill(1),
-    reductionMultiplier: 0.9,
+    reductionMultiplier: 0.7,
 
     cleanState: false,
-    debug: true,
+    debug: false,
 };
 
 function cleanLevelScores() {
