@@ -80,7 +80,8 @@ function loadState() {
         storedState = JSON.parse(serializedState);
     }
 
-    return { ...initialState, ...storedState };
+    mergeOverrideEmpty(initialState, storedState);
+    return initialState;
 }
 
 function createSendMessage(state, reducer, render) {
