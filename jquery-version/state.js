@@ -55,6 +55,8 @@ const initialState = {
     // weights, one for each question. reduced for each correct answer.
     questionWeights: Array(ALL_QUESTIONS.size).fill(1),
     reductionMultiplier: 0.8,
+
+    cleanState: false,
 };
 
 function reducer(state, message) {
@@ -73,6 +75,11 @@ function saveState(state) {
 }
 
 function loadState() {
+    if (initialState.cleanState) {
+        localStorage.clear();
+        return initialState;
+    }
+
     let storedState = {};
     const serializedState = localStorage.getItem('gameState');
 
@@ -80,8 +87,7 @@ function loadState() {
         storedState = JSON.parse(serializedState);
     }
 
-    mergeOverrideEmpty(initialState, storedState);
-    return initialState;
+    return {...initialState, ...storedState};
 }
 
 function createSendMessage(state, reducer, render) {
