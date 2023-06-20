@@ -43,6 +43,10 @@ function handleAnswerSelected(state, payload) {
     if (isCorrect) {
         levelScores[state.currentLevel.difficulty].correct++;
         questionWeights[state.questionState.correctAnswerIndex] *= state.reductionMultiplier;
+
+        if (questionWeights[state.questionState.correctAnswerIndex] < 0.9) {
+            questionWeights = rescale(questionWeights);
+        }
     } else {
         attempts++;
         if (attempts === MAX_INCORRECT_ANSWERS) {

@@ -55,3 +55,8 @@ function shuffle(xs) {
         [xs[i], xs[j]] = [xs[j], xs[i]];
     }
 }
+
+function rescale(array) {
+    let min = Math.min(...array);
+    return array.map(num => num / min);
+}
