@@ -8,3 +8,4 @@
 ## TODO
 
 - Handle underflow in weight updates.
+- Fix a bug when reloading the game right at the last tick of the question.
