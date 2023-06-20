@@ -8,4 +8,3 @@
 ## TODO
 
 - Handle underflow in weight updates.
-- Add timer for a level including rendering.

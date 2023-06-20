@@ -69,27 +69,29 @@ function handleAnswerSelected(state, payload) {
 }
 
 function generateAnswers(table, count, correctAnswer, correctAnswerIndex) {
-    const answers = [correctAnswer];
     count = Math.min(count, table.size - 2); // -2 to account for correct answer
 
+    const candidates = [];
     let i = 1;
-    while (answers.length < count && i < 5 * count) {
+    while (candidates.length < count * 2 && i < 5 * count) {
         // 5 * count is an infinite loop guard
         let shift = (i % 2 === 0) ? i / 2 : -(Math.floor(i / 2) + 1);
         let idx = correctAnswerIndex + shift;
 
         if (0 <= idx && idx < table.size) {
             let [a, b] = table.multipliers(idx);
-            let ans = a * b;
+            let wrongAnswer = a * b;
 
-            if (!answers.includes(ans)) {
-                answers.push(ans);
+            if (!candidates.includes(wrongAnswer) && wrongAnswer !== correctAnswer) {
+                candidates.push(wrongAnswer);
             }
         }
 
         i++;
     }
+    shuffle(candidates);
 
+    const answers = [correctAnswer, ...candidates.slice(0, count - 1)];
     shuffle(answers);
     return answers;
 }
@@ -212,7 +214,6 @@ function handleNewGame(state, {force}) {
     if (state.gameState.timerID) {
         clearInterval(state.gameState.timerID);
     }
-    console.log('new game', state, force);
 
     let timerID = setInterval(
         () => sendMessage(timerTickMessage()),
@@ -227,6 +228,8 @@ function handleNewGame(state, {force}) {
         console.log("continue");
         timerStart -= state.gameState.timerDuration - state.gameState.remainingTime;
         levelScores = state.levelScores;
+    } else {
+        console.log("new game");
     }
 
     let nextState = {

@@ -1,18 +1,18 @@
 let ALL_QUESTIONS = generateTable(1, 9, 1, 9);
 
 const levelConfig = {
-    EASY: generateLevel("EASY", 1, 5, "🐣", null, 1),
-    MEDIUM: generateLevel("MEDIUM", 2, 6, "🐥", 16000, 2),
-    HARD: generateLevel("HARD", 3, 9, "💪", 12000, 3),
-    EXPERT: generateLevel("EXPERT", 4, 9, "⚡", 7000, 4),
-    MASTER: generateLevel("MASTER", 2, 9, "🏆", 4000, 5),
+    EASY: generateLevel("EASY", 0, 43, "🐣", null, 1),
+    MEDIUM: generateLevel("MEDIUM", 23, 61, "🐥", 16000, 2),
+    HARD: generateLevel("HARD", 23, 81, "💪", 12000, 3),
+    EXPERT: generateLevel("EXPERT", 43, 81, "⚡", 7000, 4),
+    MASTER: generateLevel("MASTER", 23, 81, "🏆", 4000, 5),
 };
 
 function generateLevel(difficulty, min, max, emoji, timerDuration, weight) {
     return {
         difficulty,
-        min: ALL_QUESTIONS.index(min, min),
-        max: ALL_QUESTIONS.index(max, max),
+        min: min,
+        max: max,
         emoji,
         timerDuration,
         weight,

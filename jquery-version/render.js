@@ -103,7 +103,6 @@ function renderGameTimer(state) {
     });
 
     $gameRestartButton.off('click').click(() => {
-        console.log("restart");
         sendMessage(newGameMessage(true));
     });
 
