@@ -85,7 +85,6 @@ function handleNewQuestion(state) {
     if (state.timerID) {
         clearInterval(state.timerID);
     }
-    console.log(state.questionWeights);
 
     const [num1, num2] = getRandomQuestion(
         ALL_QUESTIONS,
@@ -111,13 +110,14 @@ function handleNewQuestion(state) {
     return {
         ...state,
         question: question,
+        questionTimerStart: Date.now(),
         correctAnswer: correctAnswer,
         correctAnswerIndex: correctAnswerIndex,
         allAnswers: allAnswers,
         attempts: 0,
         clickedAnswerIndices: [],
         transitioning: false,
-        timer: state.currentLevel.timerDuration,
+        remainingTime: state.currentLevel.timerDuration,
         timerID: timerID,
         highlightCorrect: false,
     };
@@ -143,10 +143,12 @@ function handleTimerTick(state) {
     }
 
     const nextState = { ...state };
-    const remainingTime = Math.max(0, state.timer - TIMER_TICK_PERIOD);
-    nextState.timer = remainingTime;
+    const now = Date.now();
+    const elapsed = now - state.questionTimerStart;
+    const remainingTime = Math.max(0, state.currentLevel.timerDuration - elapsed);
+    nextState.remainingTime = remainingTime;
 
-    if (remainingTime === 0) {
+    if (remainingTime <= 0) {
         nextState.highlightCorrect = true;
         return handleNewQuestionTransition(nextState);
     }

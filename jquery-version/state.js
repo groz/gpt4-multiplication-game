@@ -32,6 +32,7 @@ const initialState = {
     ],
     currentLevel: levelConfig.EASY,
     question: "",
+    questionTimerStart: null,
     correctAnswer: null,
     correctAnswerIndex: null,
     allAnswers: [],
@@ -45,7 +46,7 @@ const initialState = {
     attempts: 0,
     clickedAnswerIndices: [],
     transitioning: false,
-    timer: null,
+    remainingTime: null,
     timerID: null,
     highlightCorrect: false,
 

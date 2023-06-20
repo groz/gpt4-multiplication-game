@@ -62,8 +62,8 @@ function renderTimerProgress(state) {
         $timerProgress.hide();
     }
 
-    const timerPercentage = state.timer
-        ? (state.timer / state.currentLevel.timerDuration) * 100
+    const timerPercentage = state.remainingTime
+        ? (state.remainingTime / state.currentLevel.timerDuration) * 100
         : 0;
 
     if (!state.transitioning) {

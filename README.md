@@ -7,5 +7,5 @@
 
 ## TODO
 
-- Fix timer to be absolute value from start and not an accumulated value from the tick handler.
 - Handle underflow in weight updates.
+- Add timer for a level including rendering.
