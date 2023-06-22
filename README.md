@@ -7,6 +7,4 @@
 
 ## TODO
 
-- Put timer and restart button into one container and don't overlay on each other.
-- Log probabilities of questions on game start.
 - Remove continue game code from newGame handler.

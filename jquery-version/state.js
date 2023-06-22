@@ -7,8 +7,8 @@ const REDUCTION_MULTIPLIER = 0.7;
 const levelConfig = {
     EASY: generateLevel("EASY", 0, 43, "🐣", null, 1),
     MEDIUM: generateLevel("MEDIUM", 23, 61, "🐥", 16000, 2),
-    HARD: generateLevel("HARD", 23, 81, "💪", 12000, 3),
-    EXPERT: generateLevel("EXPERT", 43, 81, "⚡", 7000, 4),
+    HARD: generateLevel("HARD", 43, 81, "💪", 12000, 3),
+    EXPERT: generateLevel("EXPERT", 23, 81, "⚡", 7000, 4),
     MASTER: generateLevel("MASTER", 23, 81, "🏆", 4000, 5),
 };
 
@@ -84,10 +84,10 @@ function reducer(state, message) {
 
 function saveState(state) {
     console.log("saving state");
-    const storedState = { 
+    const storedState = {
         questionWeights: state.questionWeights,
         currentLevel: state.currentLevel,
-     };
+    };
     const serializedState = JSON.stringify(storedState);
     localStorage.setItem('gameState', serializedState);
 }
