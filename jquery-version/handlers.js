@@ -45,7 +45,8 @@ function handleAnswerSelected(state, payload) {
         questionWeights[state.questionState.correctAnswerIndex] *= REDUCTION_MULTIPLIER;
 
         if (questionWeights[state.questionState.correctAnswerIndex] < 0.5) {
-            questionWeights = rescale(questionWeights);
+            console.log("rescaling");
+            inplaceRescale(questionWeights);
         }
     } else {
         attempts++;
@@ -214,7 +215,27 @@ function handleTimerTick(state) {
     return nextState;
 }
 
+function logProbabilities(table, questionWeights) {
+    const probabilities = [];
+    for (let i = 0; i < table.size; i++) {
+        let [a, b] = table.multipliers(i);
+        let question = `${a}x${b}`;
+        let item = [questionWeights[i], question];
+        probabilities.push(item);
+    }
+
+    probabilities.sort((a, b) => b[0] - a[0]);
+
+    for (let i = 0; i < probabilities.length; i++) {
+        let [weight, question] = probabilities[i];
+        let formattedWeight = weight.toFixed(2);
+        console.log(`${question}: ${formattedWeight}`);
+    }
+}
+
 function handleNewGame(state, {force}) {
+    logProbabilities(ALL_QUESTIONS, state.questionWeights);
+
     if (state.gameState.timerID) {
         clearInterval(state.gameState.timerID);
     }

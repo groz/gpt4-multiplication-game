@@ -60,3 +60,10 @@ function rescale(array) {
     let min = Math.min(...array);
     return array.map(num => num / min);
 }
+
+function inplaceRescale(xs) {
+    let min = Math.min(...xs);
+    for (let i = 0; i < xs.length; i++) {
+        xs[i] /= min;
+    }
+}
