@@ -21,3 +21,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# elm-package generated files
+elm-stuff
+# elm-repl generated files
+repl-temp-*
