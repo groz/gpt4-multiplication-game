@@ -27,6 +27,9 @@ function newQuestionTransitionMessage() {
 function timerTickMessage() {
     return {
         type: "TIMER_TICK",
+        config: {
+            storeState: false,
+        }
     };
 }
 

@@ -42,7 +42,7 @@ function handleAnswerSelected(state, payload) {
 
     if (isCorrect) {
         levelScores[state.currentLevel.difficulty].correct++;
-        questionWeights[state.questionState.correctAnswerIndex] *= state.reductionMultiplier;
+        questionWeights[state.questionState.correctAnswerIndex] *= REDUCTION_MULTIPLIER;
 
         if (questionWeights[state.questionState.correctAnswerIndex] < 0.5) {
             questionWeights = rescale(questionWeights);

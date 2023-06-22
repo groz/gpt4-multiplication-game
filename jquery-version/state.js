@@ -1,4 +1,8 @@
-let ALL_QUESTIONS = generateTable(1, 9, 1, 9);
+const ALL_QUESTIONS = generateTable(1, 9, 1, 9);
+const MAX_INCORRECT_ANSWERS = 2;
+const TIMER_TICK_PERIOD = 50;
+// how much to reduce the weight of a question after a correct answer
+const REDUCTION_MULTIPLIER = 0.7;
 
 const levelConfig = {
     EASY: generateLevel("EASY", 0, 43, "🐣", null, 1),
@@ -18,9 +22,6 @@ function generateLevel(difficulty, min, max, emoji, timerDuration, weight) {
         weight,
     }
 }
-
-const MAX_INCORRECT_ANSWERS = 2;
-const TIMER_TICK_PERIOD = 50;
 
 const initialState = {
     levels: [
@@ -50,7 +51,7 @@ const initialState = {
         // timerDuration: 2 * 1000, // 2 seconds
         remainingTime: null,
         timerText: "",
-        
+
         // has to be true in initial state to start a new game
         // TODO: debug why this is necessary
         isGameOver: true,
@@ -58,7 +59,6 @@ const initialState = {
 
     // weights, one for each question. reduced for each correct answer.
     questionWeights: Array(ALL_QUESTIONS.size).fill(1),
-    reductionMultiplier: 0.7,
 
     cleanState: false,
     debug: false,
@@ -83,7 +83,12 @@ function reducer(state, message) {
 }
 
 function saveState(state) {
-    const serializedState = JSON.stringify(state);
+    console.log("saving state");
+    const storedState = { 
+        questionWeights: state.questionWeights,
+        currentLevel: state.currentLevel,
+     };
+    const serializedState = JSON.stringify(storedState);
     localStorage.setItem('gameState', serializedState);
 }
 
@@ -117,7 +122,10 @@ function createSendMessage(state, reducer, render) {
                 console.log("new state: ", state);
             }
 
-            saveState(state);
+            // store state unless explicitly told not to
+            if (!message.config || message.config.storeState !== false) {
+                saveState(state);
+            }
             render(state);
         }
 
