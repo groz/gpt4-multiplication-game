@@ -1,65 +1,58 @@
-module Main exposing (..)
-
--- Press buttons to increment and decrement a counter.
---
--- Read how it works:
---   https://guide.elm-lang.org/architecture/buttons.html
---
+module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Html exposing (Html, pre, text)
+import Http
+import Json.Decode exposing (Decoder, field, int, map2, string)
+import Platform.Cmd exposing (none)
+import Random
+import Task
+import Time
 
 
+type alias Model =
+    { dice : Int
+    , time : Time.Posix
+    }
 
--- MAIN
+
+type Msg
+    = Tick Time.Posix
+    | Roll Int
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox { init = init, update = update, view = view }
+    Browser.element
+        { init = init
+        , update = update
+        , view = view
+        , subscriptions = subscriptions
+        }
 
 
-
--- MODEL
-
-
-type alias Model =
-    Int
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Time.every 1000 Tick
 
 
-init : Model
-init =
-    0
+init : () -> ( Model, Cmd Msg )
+init _ =
+    ( { dice = 1, time = Time.millisToPosix 0 }
+    , Cmd.none
+    )
 
 
-
--- UPDATE
-
-
-type Msg
-    = Increment
-    | Decrement
-
-
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increment ->
-            model + 1
+        Tick time ->
+            ( { model | time = time }, Random.generate Roll (Random.int 1 6) )
 
-        Decrement ->
-            model - 1
-
-
-
--- VIEW
+        Roll dice ->
+            ( { model | dice = dice }, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ button [ onClick Decrement ] [ text "-" ]
-        , div [] [ text (String.fromInt model) ]
-        , button [ onClick Increment ] [ text "+" ]
-        ]
+    model.dice |> String.fromInt |> text
