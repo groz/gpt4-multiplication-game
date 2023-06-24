@@ -3,7 +3,9 @@ function render(state) {
         let scores = calcScores(state);
         let totalScore = Math.max(scores.correct - scores.incorrect, 0);
         $('.question').text(totalScore);
+        $('.options').hide();
     } else {
+        $('.options').show();
         $('.question').text(state.questionState.questionText);
     }
 
@@ -11,6 +13,7 @@ function render(state) {
         const $button = $('.levels button').eq(index);
         renderLevelButton($button, state, level);
     });
+
 
     state.questionState.allAnswers.forEach((answer, index) => {
         const $button = $('.options button').eq(index);
