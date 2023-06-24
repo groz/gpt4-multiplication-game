@@ -7,8 +7,4 @@
 
 ## TODO
 
-- Make UI nicer
-  - Design starting/restarting the game buttons better.
-  - Make the game look nicer.
-  - Show final score nicer.
-- Let user change levels when game is finished.
+- Show final score nicer.

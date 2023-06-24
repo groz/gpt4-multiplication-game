@@ -8,11 +8,15 @@ const messageHandlers = {
 };
 
 function handleLevelChanged(state, payload) {
+    const { level } = payload;
+
     if (state.gameState.isGameOver) {
-        return state;
+        return {
+            ...state,
+            currentLevel: level,
+        };
     }
 
-    const { level } = payload;
     const nextState = {
         ...state,
         currentLevel: level,
