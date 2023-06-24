@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    sendMessage(newGameMessage());
+    sendMessage(initGameMessage());
     $("#game-container").focus();
 
     window.addEventListener('keydown', function(event) {

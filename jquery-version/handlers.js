@@ -4,6 +4,7 @@ const messageHandlers = {
     NEW_QUESTION: handleNewQuestion,
     TIMER_TICK: handleTimerTick,
     NEW_GAME: handleNewGame,
+    INIT_GAME: handleInitGame,
 };
 
 function handleLevelChanged(state, payload) {
@@ -221,44 +222,38 @@ function logProbabilities(table, questionWeights) {
     }
 }
 
-function handleNewGame(state, {force}) {
+function handleNewGame(state) {
+    console.log("new game");
+
     logProbabilities(ALL_QUESTIONS, state.questionWeights);
 
     if (state.gameState.timerID) {
+        console.log("clearing timer interval: " + state.gameState.timerID);
         clearInterval(state.gameState.timerID);
     }
 
+    let nextState = handleInitGame(state);
+    nextState.gameState.isGameOver = false;
+    return handleNewQuestion(nextState);
+}
+
+function handleInitGame(state) {
     let timerID = setInterval(
         () => sendMessage(timerTickMessage()),
         TIMER_TICK_PERIOD
     );
 
-    let levelScores = cleanLevelScores();
-
-    let timerStart = Date.now();
-    let isContinue = !force && !state.gameState.isGameOver;
-    if (isContinue) {
-        console.log("continue");
-        timerStart -= state.gameState.timerDuration - state.gameState.remainingTime;
-        levelScores = state.levelScores;
-    } else {
-        console.log("new game");
-    }
-
     let nextState = {
         ...state,
-        levelScores: levelScores,
+        levelScores: cleanLevelScores(),
         gameState: {
             ...state.gameState,
-            timerStart: timerStart,
+            timerStart: Date.now(),
             timerID: timerID,
-            isGameOver: false,
+            isGameOver: true,
         },
     }
 
     nextState.questionState.transitioning = false;
-
-    return isContinue
-        ? handleTimerTick(nextState)
-        : handleNewQuestion(nextState);
+    return handleTimerTick(nextState);
 }

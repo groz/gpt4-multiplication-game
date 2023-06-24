@@ -51,10 +51,7 @@ const initialState = {
         // timerDuration: 2 * 1000, // 2 seconds
         remainingTime: null,
         timerText: "",
-
-        // has to be true in initial state to start a new game
-        // TODO: debug why this is necessary
-        isGameOver: true,
+        isGameOver: false,
     },
 
     // weights, one for each question. reduced for each correct answer.

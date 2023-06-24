@@ -7,4 +7,8 @@
 
 ## TODO
 
-- Remove continue game code from newGame handler.
+- Make UI nicer
+  - Design starting/restarting the game buttons better.
+  - Make the game look nicer.
+  - Show final score nicer.
+- Let user change levels when game is finished.

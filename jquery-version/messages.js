@@ -33,9 +33,15 @@ function timerTickMessage() {
     };
 }
 
-function newGameMessage(force = false) {
+function newGameMessage() {
     return {
         type: "NEW_GAME",
-        payload: { force },
+    };
+}
+
+
+function initGameMessage() {
+    return {
+        type: "INIT_GAME",
     };
 }
