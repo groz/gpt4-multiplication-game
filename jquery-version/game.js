@@ -1,6 +1,5 @@
 $(document).ready(function () {
     sendMessage(initGameMessage());
-    $("#game-container").focus();
 
     window.addEventListener('keydown', function(event) {
         if(!event.ctrlKey) {

@@ -1,4 +1,7 @@
 function render(state) {
+    $(".game-container").show();
+    $(".game-container").css("display", "flex");
+
     if (state.gameState.isGameOver) {
         let scores = calcScores(state);
         let totalScore = Math.max(scores.correct - scores.incorrect, 0);

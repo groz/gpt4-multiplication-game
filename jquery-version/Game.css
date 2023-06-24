@@ -6,11 +6,12 @@
 
 .game-container {
     flex-grow: 1;
-    display: flex;
+    /* display: flex; */
     flex-direction: column;
     justify-content: space-between;
     min-height: 90%;
     padding: 1rem;
+    display: none;
 }
 
 .levels {
