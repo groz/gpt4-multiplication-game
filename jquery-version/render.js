@@ -1,5 +1,11 @@
 function render(state) {
-    $('.question').text(state.questionState.questionText);
+    if (state.gameState.isGameOver) {
+        let scores = calcScores(state);
+        let totalScore = Math.max(scores.correct - scores.incorrect, 0);
+        $('.question').text(totalScore);
+    } else {
+        $('.question').text(state.questionState.questionText);
+    }
 
     state.levels.forEach((level, index) => {
         const $button = $('.levels button').eq(index);
@@ -55,16 +61,13 @@ function renderAnswerButton($button, state, index) {
 function renderTimerProgress(state) {
     const $timerContainer = $(".timer-container");
     const $timerProgress = $(".timer-progress");
-    const $timerMarker = $(".timer-marker");
 
     if (state.currentLevel.timerDuration) {
         $timerContainer.show();
         $timerProgress.show();
-        $timerMarker.show();
         $timerContainer.removeClass("timer-container-hidden");
     } else {
         $timerProgress.hide();
-        $timerMarker.hide();
         $timerContainer.addClass("timer-container-hidden");
     }
 
@@ -77,20 +80,25 @@ function renderTimerProgress(state) {
     }
 }
 
-function renderScoreboard(state) {
-    const correctScore = Object.keys(state.levelScores).reduce((sum, difficulty) => {
+function calcScores(state) {
+    return Object.keys(state.levelScores).reduce((sum, difficulty) => {
         const levelScore = state.levelScores[difficulty];
         const levelWeight = levelConfig[difficulty].weight;
-        return sum + (levelScore.correct * levelWeight);
-    }, 0);
 
-    const incorrectScore = Object.keys(state.levelScores).reduce((sum, difficulty) => {
-        const levelScore = state.levelScores[difficulty];
-        return sum + levelScore.incorrect;
-    }, 0);
+        return {
+            correct: sum.correct + (levelScore.correct * levelWeight),
+            incorrect: sum.incorrect + (levelScore.incorrect * levelWeight),
+        }
+    }, {
+        correct: 0,
+        incorrect: 0,
+    });
+}
 
-    $("#correct-score").text(correctScore);
-    $("#incorrect-score").text(incorrectScore);
+function renderScoreboard(state) {
+    const scores = calcScores(state);
+    $("#correct-score").text(scores.correct);
+    $("#incorrect-score").text(scores.incorrect);
 }
 
 function renderGameTimer(state) {
@@ -117,7 +125,7 @@ function renderGameTimer(state) {
     if (state.gameState.isGameOver) {
         $gameTimer.hide();
         $gameRestartButton.hide();
-        $gameStartButton.show();        
+        $gameStartButton.show();
     } else {
         $gameTimer.show();
         $gameRestartButton.show();

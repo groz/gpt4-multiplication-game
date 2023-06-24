@@ -1,11 +1,11 @@
 const ALL_QUESTIONS = generateTable(1, 9, 1, 9);
-const MAX_INCORRECT_ANSWERS = 2;
+const MAX_INCORRECT_ANSWERS = 1;
 const TIMER_TICK_PERIOD = 50;
 // how much to reduce the weight of a question after a correct answer
 const REDUCTION_MULTIPLIER = 0.7;
 
 const levelConfig = {
-    EASY: generateLevel("EASY", 0, 43, "🐣", null, 1),
+    EASY: generateLevel("EASY", 0, 81, "🐣", null, 1),
     MEDIUM: generateLevel("MEDIUM", 23, 61, "🐥", 16000, 2),
     HARD: generateLevel("HARD", 43, 81, "💪", 12000, 3),
     EXPERT: generateLevel("EXPERT", 23, 81, "⚡", 7000, 4),

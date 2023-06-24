@@ -200,18 +200,6 @@ function handleTimerTick(state) {
         return handleNewQuestionTransition(nextState);
     }
 
-    // Remove one of the wrong answers after half the time has elapsed
-    if (
-        remainingTime <= (state.currentLevel.timerDuration / 2) &&
-        nextState.questionState.attempts === 0
-    ) {
-        const wrongAnswerIndex = state.questionState.allAnswers.findIndex(
-            (answer) => answer !== state.questionState.correctAnswer
-        );
-
-        sendMessage(answerSelectedMessage(wrongAnswerIndex));
-    }
-
     return nextState;
 }
 

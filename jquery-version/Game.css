@@ -137,14 +137,6 @@
     border-radius: 5px;
 }
 
-.timer-marker {
-    position: absolute;
-    width: 2px;
-    height: 100%;
-    background-color: #000;
-    left: 50%;
-}
-
 .game-start {
     border-radius: 5px;
     border-style: solid;
